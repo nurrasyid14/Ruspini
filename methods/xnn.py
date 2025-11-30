@@ -28,34 +28,33 @@ def run_nn(X, y, train_idx, test_idx, n_neighbors=3):
 
 
 def explore(X, y, splitter_fn, n_neighbors=3, **kwargs):
-    """
-    Run kNN exploration with a given splitter function.
-    splitter_fn: one of the functions from splitter (KFold, StratKFoldSplit, etc.)
-    kwargs: parameters for the splitter function (e.g., n_splits, test_size, p, etc.)
-    """
     results = []
 
-    # Some splitters require y (like StratKFoldSplit), others don't
+    # Ensure splitter produces (train_idx, test_idx)
     try:
-        splits = splitter_fn(X, y, **kwargs)  # try with y
+        splits = splitter_fn(X, y, **kwargs)
     except TypeError:
-        splits = splitter_fn(X, **kwargs)     # fallback without y
+        splits = splitter_fn(X, **kwargs)
 
-    for i, (train_idx, test_idx) in enumerate(splits):
+    for train_idx, test_idx in splits:
+
         preds, acc, cm, report, distances, neighbors = run_nn(
             X, y, train_idx, test_idx, n_neighbors
         )
 
         results.append({
-        "train_size": len(train_idx),
-        "test_size": len(test_idx),
-        "accuracy": acc,
-        "confusion_matrix": cm.tolist(),
-        "report": report,
-        "train_indices": list(map(int, train_idx)),
-        "test_indices": list(map(int, test_idx))
+            "train_size": len(train_idx),
+            "test_size": len(test_idx),
+            "accuracy": acc,
+            "confusion_matrix": cm.tolist(),
+            "report": report,
+            "train_indices": list(map(int, train_idx)),
+            "test_indices": list(map(int, test_idx)),
+            "preds": preds.tolist(),
+            "distances": distances.tolist(),
+            "neighbors": neighbors
         })
 
-
     return results
+
 
