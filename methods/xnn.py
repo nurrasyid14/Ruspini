@@ -9,14 +9,21 @@ def run_nn(X, y, train_idx, test_idx, n_neighbors=3):
 
     model = KNeighborsClassifier(n_neighbors=n_neighbors)
     model.fit(X_train, y_train)
+
     preds = model.predict(X_test)
 
+    # NEW: distances and neighbor indices
+    distances, indices = model.kneighbors(X_test)
+
+    # convert neighbor indices to original global indices
+    global_indices = [[train_idx[i] for i in row] for row in indices]
+
     acc = accuracy_score(y_test, preds)
-    labels = sorted(set(y))   # FIX: always include all classes
+    labels = sorted(set(y))
     cm = confusion_matrix(y_test, preds, labels=labels)
     report = classification_report(y_test, preds, labels=labels, output_dict=True)
 
-    return preds, acc, cm, report
+    return preds, acc, cm, report, distances, global_indices
 
 
 
