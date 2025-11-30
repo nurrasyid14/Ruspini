@@ -42,7 +42,10 @@ def explore(X, y, splitter_fn, n_neighbors=3, **kwargs):
         splits = splitter_fn(X, **kwargs)     # fallback without y
 
     for i, (train_idx, test_idx) in enumerate(splits):
-        preds, acc, cm, report = run_nn(X, y, train_idx, test_idx, n_neighbors)
+        preds, acc, cm, report, distances, neighbors = run_nn(
+            X, y, train_idx, test_idx, n_neighbors
+        )
+
         results.append({
         "train_size": len(train_idx),
         "test_size": len(test_idx),
